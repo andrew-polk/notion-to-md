@@ -167,7 +167,7 @@ export class NotionToMarkdown {
     if (!blocks) return mdBlocks;
 
     for (let i = 0; i < blocks.length; i++) {
-      let block = blocks[i];
+      let block :ListBlockChildrenResponseResult= blocks[i];
 
       if ("has_children" in block && block.has_children) {
         // Get children of this block.
@@ -186,12 +186,17 @@ export class NotionToMarkdown {
         });
 
         // Recursively call blocksToMarkdown to get children of this block.
+        // check for custom transformer before parsing child
+        if (
+          !(block.type in this.customTransformers) &&
+          !this.customTransformers[block.type]
+        ) {
         let l = mdBlocks.length;
         await this.blocksToMarkdown(
           child_blocks,
           totalPage,
           mdBlocks[l - 1].children
-        );
+        );}
         continue;
       }
 
